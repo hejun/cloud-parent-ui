@@ -1,0 +1,9 @@
+# idea
+/.idea/
+*.iml
+# project
+/node_modules/
+/package-lock.json
+/dist/
+/build/
+.env.production
