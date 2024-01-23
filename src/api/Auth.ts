@@ -31,13 +31,17 @@ export async function obtainAccessToken(code: string): Promise<Authorization> {
     redirect_uri: redirectUri
   }
 
-  const res = await http.post<any, any>(`${issuer}/oauth2/token`, new URLSearchParams(Object.entries(params)), {
-    auth: {
-      username: clientId,
-      password: clientSecret
+  const { access_token, refresh_token, id_token, scope, token_type, expires_in } = await http.post<any, any>(
+    `${issuer}/oauth2/token`,
+    new URLSearchParams(Object.entries(params)),
+    {
+      auth: {
+        username: clientId,
+        password: clientSecret
+      }
     }
-  })
-  const { access_token, refresh_token, id_token, scope, token_type, expires_in } = res.data
+  )
+
   const userinfo = JSON.parse(enc.Utf8.stringify(enc.Base64.parse(id_token.split('.')[1])))
   if (userinfo.nonce === nonce) {
     const expireAt = new Date()
@@ -52,4 +56,50 @@ export async function obtainAccessToken(code: string): Promise<Authorization> {
     }
   }
   return Promise.reject('nonce is invalid')
+}
+
+let promise: Promise<Authorization> | null
+
+export async function obtainRefreshToken(refreshToken: string): Promise<Authorization> {
+  if (promise) {
+    return promise
+  }
+  const issuer = import.meta.env.VITE_OAUTH_ISSUER
+  const clientId = import.meta.env.VITE_OAUTH_CLIENT_ID
+  const clientSecret = import.meta.env.VITE_OAUTH_CLIENT_SECRET
+  const params = {
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken
+  }
+  promise = http
+    .post<any, any>(`${issuer}/oauth2/token`, new URLSearchParams(Object.entries(params)), {
+      auth: {
+        username: clientId,
+        password: clientSecret
+      }
+    })
+    .then(res => {
+      if (res) {
+        const { access_token, refresh_token, id_token, scope, token_type, expires_in } = res
+        const expireAt = new Date()
+        expireAt.setSeconds(expireAt.getSeconds() + expires_in)
+        return {
+          accessToken: access_token,
+          refreshToken: refresh_token,
+          idToken: id_token,
+          scope: scope.split(' '),
+          tokenType: token_type,
+          expireAt: expireAt.getTime()
+        }
+      } else {
+        return Promise.reject('Refresh failed')
+      }
+    })
+  promise.finally(() => (promise = null))
+  return promise
+}
+
+export function loadUserinfo() {
+  const issuer = import.meta.env.VITE_OAUTH_ISSUER
+  return http.get<any, Authorization>(`${issuer}/userinfo`)
 }
