@@ -1,4 +1,5 @@
 import { enc } from 'crypto-js'
+import { useAuthStore } from '@/store'
 import { randomString } from '@/utils/Random'
 import http from '@/utils/Http'
 
@@ -97,6 +98,15 @@ export async function obtainRefreshToken(refreshToken: string): Promise<Authoriz
     })
   promise.finally(() => (promise = null))
   return promise
+}
+
+export function logout() {
+  const issuer = import.meta.env.VITE_OAUTH_ISSUER
+  Promise.resolve()
+    .then(() => useAuthStore().destroyAuthorization())
+    .then(() => {
+      window.location.href = `${issuer}/logout?redirect_uri=${window.location.href}`
+    })
 }
 
 export function loadUserinfo() {
