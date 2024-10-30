@@ -7,7 +7,7 @@ import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
 
 export default [
   { files: ['**/*.{js,mjs,cjs,ts,vue}'] },
-  { languageOptions: { globals: globals.browser } },
+  { languageOptions: { globals: globals.browser, parser: pluginVue, parserOptions: { parser: tseslint.parser } } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/essential'],
