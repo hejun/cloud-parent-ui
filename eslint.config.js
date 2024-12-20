@@ -1,18 +1,12 @@
-import globals from 'globals'
-import pluginJs from '@eslint/js'
-import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'
-import eslintConfigPrettier from 'eslint-config-prettier'
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended'
+import vueTsEslintConfig from '@vue/eslint-config-typescript'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
 export default [
   { files: ['**/*.{js,mjs,cjs,ts,vue}'] },
-  { languageOptions: { globals: globals.browser, parser: pluginVue, parserOptions: { parser: tseslint.parser } } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/essential'],
-  eslintConfigPrettier,
-  eslintPluginPrettier,
+  ...vueTsEslintConfig(),
+  skipFormatting,
   {
     rules: {
       'vue/script-indent': ['error', 2, { baseIndent: 0, switchCase: 0, ignores: [] }],
