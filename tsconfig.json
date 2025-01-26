@@ -8,6 +8,6 @@
       "#/*": ["./types/*"]
     }
   },
-  "include": ["env.d.ts", "vite.config.*", "src/**/*.ts", "src/**/*.vue", "types/**/*.ts", "types/**/*.d.ts"],
+  "include": ["env.d.ts", "vite.config.*", "src/**/*.ts", "src/**/*.vue", "src/**/*.tsx", "types/**/*.ts", "types/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
