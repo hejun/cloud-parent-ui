@@ -1,13 +1,29 @@
-import pluginVue from 'eslint-plugin-vue'
-import vueTsEslintConfig from '@vue/eslint-config-typescript'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import eslint from '@eslint/js'
+import globals from 'globals'
+import eslintPluginVue from 'eslint-plugin-vue'
+import typescriptEslint from 'typescript-eslint'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
-export default [
-  { files: ['**/*.{js,mjs,cjs,ts,vue}'] },
-  ...pluginVue.configs['flat/essential'],
-  ...vueTsEslintConfig(),
-  skipFormatting,
+export default typescriptEslint.config(
+  { ignores: ['**/dist'] },
   {
+    extends: [
+      eslint.configs.recommended,
+      ...typescriptEslint.configs.recommended,
+      ...eslintPluginVue.configs['flat/strongly-recommended']
+    ],
+    files: ['**/*.{js,mjs,cjs,ts,tsx,vue}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: {
+        parser: typescriptEslint.parser,
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
+    },
     rules: {
       'vue/script-indent': ['error', 2, { baseIndent: 0, switchCase: 0, ignores: [] }],
       'vue/multi-word-component-names': 'off',
@@ -19,5 +35,6 @@ export default [
       'no-console': 'warn',
       'no-alert': 'warn'
     }
-  }
-]
+  },
+  eslintConfigPrettier
+)
